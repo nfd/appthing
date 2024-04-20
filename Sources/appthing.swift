@@ -3,6 +3,10 @@ import Foundation
 import CoreGraphics
 import AppKit
 
+/* The credit for this program goes to Stack Overflow user brimstone with this
+ * post: https://stackoverflow.com/a/46947382
+*/
+
 @main
 struct AppThing: ParsableCommand {
     @Option(help: "Name of the app.")

@@ -15,13 +15,16 @@ struct AppThing: ParsableCommand {
     @Argument(help: "Command to run.")
     public var command: String
 
-    public func activate() {
-        // Get the list of windows
+    private func get_window_list() -> [[String: AnyObject]] {
         let options = CGWindowListOption(arrayLiteral: CGWindowListOption.excludeDesktopElements, CGWindowListOption.optionOnScreenOnly)
         let windowList = CGWindowListCopyWindowInfo(options, CGWindowID(0))
-        let windows = windowList as NSArray? as! [[String: AnyObject]]
+        return windowList as NSArray? as! [[String: AnyObject]]
+    }
 
-        for window in windows {
+    public func activate() {
+        var found = false
+
+        for window in get_window_list() {
             let candidate_name = window[kCGWindowOwnerName as String]!
 
             if candidate_name as? String == name {
@@ -31,14 +34,30 @@ struct AppThing: ParsableCommand {
                 let app = apps.filter { $0.processIdentifier == id } .first
                 app?.activate()
 
+                found = true
+
                 break
             }
+        }
+
+        if !found {
+            print("App not found.")
+        }
+    }
+
+    public func list() {
+        for window in get_window_list() {
+            let name = window[kCGWindowOwnerName as String]!
+
+            print(name)
         }
     }
 
     public func run() throws {
         if command == "activate" {
             activate()
+        } else if command == "list" {
+            list()
         } else {
             print("Unknown command.")
         }
